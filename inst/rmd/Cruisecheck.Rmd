@@ -5,11 +5,9 @@ date: "11/13/2019"
 output: html_document
 ---
 ### This code will provide you an overview of the characteristics of trawl data tables. It will only work for csv data
-if your files are called op, tr_op, tr_catch, tr_l, tr_lf, tr_fish. It will fail with any other file names. It is just that simple. Fix the file names or edit the code to accept a wider range of file names with can be coerced to these and I will
-gladly add that to the package/function.
+if your files are called op, tr_op, tr_catch, tr_l, tr_lf, tr_fish. It will fail with any other file names. It is just that simple. Fix the file names or edit the code to accept a wider range of file names with can be coerced to these and I will gladly add that to the package/function.
 
-# <u>Op Data Characteristics</u>
-The first step in examing csv files is to see if they have the correct field names. If they do not, the user will be prompted to remedy this with a message stating which field names are not correct. This step is only necessary for csv files.
+The code will behave differently depending on whether or not the input is "csv" or not. The first step in examing csv files is to see if they have required fields. Such fields represent those that can't be null in the RVCAT database. If required fields are absent, or they are not properly named, the user will be prompted to remedy this with a message stating which fields are not correct. This step is only necessary for csv files.
 
 
 ```{r echo=FALSE, message = FALSE, warning = FALSE}

@@ -13,8 +13,8 @@ the results of database queries. If 'database', the user will be prompted
 to provide username, password, and dbname, which in the case of the Great
 Lakes Science Center, should be GLSC.}
 
-\item{year}{Character vector, year value in quotes. Provides information about the year, which is used
-in maming output files.}
+\item{year}{Character vector, year value in quotes. Provides information about the year, which is
+used in maming output files.}
 
 \item{lake}{Character vector. For example, "Michigan". Provides information about
 location which is used in naming output files.}

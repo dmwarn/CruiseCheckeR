@@ -6,8 +6,8 @@
 #'   to provide username, password, and dbname, which in the case of the Great
 #'   Lakes Science Center, should be GLSC.
 #' @param year
-#' Character vector, year value in quotes. Provides information about the year, which is used
-#' in maming output files.
+#' Character vector, year value in quotes. Provides information about the year, which is
+#' used in maming output files.
 #' @param lake
 #' Character vector. For example, "Michigan". Provides information about
 #' location which is used in naming output files.
@@ -36,7 +36,6 @@
 #'  a wide variety of both field and laboratory sampling exercises. More specifically,
 #'  the current iteration ONLY works with trawl data. Future developments could add
 #'  other sample types.
-#'
 CruiseCheckeR <- function(dat.source = "csv", year = "2019", lake = "Michigan",
                           username = "", password = "", dbname = "") {
   assign("year", year , envir = .GlobalEnv )

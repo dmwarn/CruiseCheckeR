@@ -21,7 +21,8 @@ will be magnified, default 0.8.}
 Plot all the variables of a data frame.
 }
 \details{
-An individual graph is generated for each variable.  Bar plots are drawn
+In this package, this function is not necessarily intended to be called by the user.
+  If it is, an individual graph is generated for each variable.  Bar plots are drawn
   for factors, characters with up to 50 unique values, and numerics
   with up to 10 unique values.  Otherwise finite values are plotted versus
   row number in \code{df}.  An empty plot is drawn for numerics with

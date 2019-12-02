@@ -7,7 +7,8 @@ Maintainer: David Warner <dmwarner@usgs.gov>
 Description: This package was developed to provide tools for evaluating
     the structure, completeness, and accuracy of data collected on ships
     operated by the USGS Great Lakes Science Center (GLSC) prior to the data
-    being entered in the the GLSC Oracle database (called RVCAT).
+    being entered in the the GLSC Oracle database (called RVCAT). The only function
+    normal users will need to call is CruiseCheckeR().
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
