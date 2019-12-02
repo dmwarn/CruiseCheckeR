@@ -1,0 +1,166 @@
+---
+title: "QAQC Notebook LM 2018"
+output:
+  html_document:
+    df_print: paged
+---
+
+This document contains code and output from QA/QC of acoustic survey midwater 
+trawl data from RVCAT or an external source.
+
+The first step is to get the data. 
+
+```{r echo = FALSE, include = FALSE, results = 'asis'}
+library(ROracle)
+library(dplyr)
+library(EchoNet2Fish)
+
+drv <- dbDriver("Oracle")
+
+con <- dbConnect(drv, username = "dmwarner", password = "GLSC1908",
+                 "GLSC")
+
+op <- dbGetQuery(con, 
+               "SELECT op.Op_Id,	Year,	Vessel,  Cruise, LOWER(Transect), Serial, Time, 
+Beg_Latitude_DD, Beg_Longitude_DD, End_Latitude_DD, End_Longitude_DD, Fishing_Depth, Tow_Time, 
+Beg_Depth, End_Depth, Op_Date, Target, Lake
+from rvcat.op, rvcat.op_target, rvcat.tr_op
+where op.op_id = op_target.op_id and op.op_id = tr_op.op_id  and lake=2 and Year =2018 and Target in (209,210,252) and 
+op.sample_type=1 and 
+LOWER(Transect) not in ('gb2', 'gb3', 'gb4', 'gb5', 'gb6', 'gb7')")
+
+
+# The following 1 column must be included in the midwater trawl operation, catch, and length csv files:
+  
+#  Op.Id = operation ID number
+#  This column serves to uniquely identify each trawl haul in the files.
+
+#The following 9 columns must be included in the midwater trawl operation csv files:
+# 
+# Year = year
+# Lake = lake ID code
+# Beg.Depth = bottom depth at beginning of trawl haul in m
+# End.Depth = bottom depth at end of trawl haul in m
+# Fishing_Depth = fishing depth of trawl haul in m
+# Transect = transect name, composed of region (the first two characters) and transect ID number (the following characters), the same as Region_name in the SV and TS files
+# Latitude = latitude in decimal degrees
+# Longitude = longitude in decimal degrees
+
+
+op <- op %>% rename(Op.Id = ends_with('_ID'), Year = starts_with('Y', ignore.case = TRUE),
+        Lake = starts_with('LA', ignore.case=TRUE), Beg.Depth = contains("BEG_D", ignore.case = TRUE),
+        End.Depth = contains("END_D", ignore.case = TRUE), Fishing_Depth = contains('ING_DEP',
+        ignore.case = TRUE), Transect = contains('TRAN', ignore.case=TRUE), 
+        Latitude = contains('BEG_LAT', ignore.case = TRUE), Longitude = contains('BEG_LON',
+        ignore.case = TRUE), Serial = contains('SER', ignore.case = TRUE), Vessel = contains('VESS', 
+                                                                                             ignore.case = T),
+        Op_Date = contains('OP_D', ignore.case = T))
+
+
+
+
+tr_catch <- dbGetQuery(con, 
+                 "SELECT op.Op_Id,	Year,	Vessel,  Cruise, LOWER(Transect), Serial, Time, Op_Date, Target, Lake,
+                 Species, N, Weight, lf_n
+from rvcat.op, rvcat.op_target, rvcat.tr_catch
+where op.op_id = op_target.op_id and op.op_id = tr_catch.op_id  and lake=2 and Year =2018 and Target in (209,210,252) and 
+op.sample_type=1 and 
+LOWER(Transect) not in ('gb2', 'gb3', 'gb4', 'gb5', 'gb6', 'gb7')")
+
+#####################################################################################
+#####################################################################################
+#  The following 3 columns must be included in the midwater trawl catch csv files:
+#  Species = species code
+#  Weight = aggregate weight in g
+#  N = number of fish weighed
+
+tr_catch <- tr_catch %>% dplyr::rename(Op.Id = ends_with('_ID'), Species = contains('SPECIES', ignore.case = TRUE),
+            Weight = contains('WEIGHT', ignore.case = TRUE), N = starts_with('N'),
+            Serial = contains("SER", ignore.case = TRUE), Vessel = contains('VESS', ignore.case = T))
+
+
+tr_lf <- dbGetQuery(con,
+"SELECT op.Op_Id,	Year,	Vessel,  Cruise, LOWER(Transect), Serial, Time, Op_Date, Target, Lake,
+Species, Length, N
+from rvcat.op, rvcat.op_target, rvcat.tr_lf
+where op.op_id = op_target.op_id and op.op_id = tr_lf.op_id  and lake=2 and Year =2018 and Target in (209,210,252) and
+op.sample_type=1 and
+LOWER(Transect) not in ('gb2', 'gb3', 'gb4', 'gb5', 'gb6', 'gb7')")
+
+#####################################################################################
+#####################################################################################
+
+# The following 3 columns must be included in the midwater trawl length csv files:
+  
+#  Species = species code
+#  Length = length of individual fish in mm
+#  N = number of fish measured
+
+tr_lf <- tr_lf %>% rename(Op.Id = ends_with('_ID'), Species = contains('SPECIES', ignore.case = TRUE),
+                Length = contains('LENGTH', ignore.case = TRUE), N = starts_with('N'),
+                Serial = contains("SER", ignore.case = TRUE), Vessel = contains('VESS', ignore.case = T))
+
+
+tr_fish <- dbGetQuery(con, 
+                       "SELECT op.Op_Id,	Year,	Vessel,  Cruise, LOWER(Transect), Serial, Time, Op_Date, Target, Lake,
+                 Species, Length, Age
+from rvcat.op, rvcat.op_target, rvcat.tr_fish
+where op.op_id = op_target.op_id and op.op_id = tr_fish.op_id  and lake=2 and Year =2018 and Target in (209,210,252) and 
+op.sample_type=1 and 
+LOWER(Transect) not in ('gb2', 'gb3', 'gb4', 'gb5', 'gb6', 'gb7')")
+
+tr_fish <- tr_fish %>% rename(Op.Id = ends_with('_ID'), Species = contains('SPECIES', ignore.case = TRUE),
+                    Length = contains('LENGTH', ignore.case = TRUE), Age = contains('AGE', ignore.case = TRUE),
+                    Serial = contains("SER", ignore.case = TRUE), Vessel = contains('VESS', ignore.case = T))
+```
+
+
+
+# <u>Op-trop Data Characteristics</u>
+```{r echo=FALSE}
+                                         
+opdf <- as.data.frame(dfSmry(op))
+knitr::kable(opdf)
+```
+
+
+
+# <u>Plot of Op-trop Variables</u>
+```{r echo=FALSE}
+dfPlot(op, mcex=1.1, cex = 0.8, mfrow=c(2,2))
+```
+
+
+
+# <u>Map of Operation Locations</u>
+```{r  echo=FALSE, warning=FALSE, message=FALSE, error=FALSE, error=FALSE, fig.dim = c(12,10)}
+
+library(leaflet)
+library(leaflet.extras)
+library(htmltools)
+library(htmlwidgets)
+library(mapedit)
+library(mapview)
+
+
+jub <- leaflet() %>%
+#addTiles() %>%
+#addCircleMarkers(lng = ~Longitude, lat = ~Latitude, opacity=0.1, radius =4,
+#             popup = paste("Serial:", op$Serial, "<br>",
+#                           "Beg.Depth:", op$Beg.Depth, "<br>",
+#                           "Op_Date:", op$Op_Date, "<br>",
+#                           "Vessel:", op$Vessel, "<br>",
+#                           "Latitude:", op$Latitude, "<br>",
+#                           "Longitude:", op$Longitude))%>%
+   mapview::addFeatures(
+    data=op_sf, weight = 1, color = "#000000")
+
+selectFeatures(jub,
+         mode = "draw", op = sf::st_contains(x, op_sf))
+
+
+
+```
+
+```{r}
+```

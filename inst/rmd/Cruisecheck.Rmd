@@ -1,0 +1,254 @@
+---
+title: "CruiseCheck"
+author: "Dave Warner"
+date: "11/13/2019"
+output: html_document
+---
+### This code will provide you an overview of the characteristics of trawl data tables. It will only work for csv data
+if your files are called op, tr_op, tr_catch, tr_l, tr_lf, tr_fish. It will fail with any other file names. It is just that simple. Fix the file names or edit the code to accept a wider range of file names with can be coerced to these and I will
+gladly add that to the package/function.
+
+# <u>Op Data Characteristics</u>
+The first step in examing csv files is to see if they have the correct field names. If they do not, the user will be prompted to remedy this with a message stating which field names are not correct. This step is only necessary for csv files.
+
+
+```{r echo=FALSE, message = FALSE, warning = FALSE}
+library(janitor)
+library(tidyverse)
+library(CruiseCheckeR)
+
+data("op_names")
+op <- op %>% clean_names(case = "all_caps")
+  obs_names <- names(op)
+  #check for required fields that can't be NULL. Excepted for csv inputs
+  #is 'OP_ID'
+required <- c('YEAR', 'VESSEL', 'SERIAL', 'SAMPLE_TYPE', 'LAKE', 'PORT',                             'CRUISE', 'OP_DATE', 'TIME')  
+missed <- setdiff(required, obs_names)
+if (length(missed) > 0)
+    stop(print(paste0("The Op data are missing the required field(s) ", missed)))
+```
+
+
+# <u>Table of Op Variables</u>
+```{r echo=FALSE, message = FALSE, warning = FALSE}
+df <- as.data.frame(CruiseCheckeR::dfSmry(op))
+
+knitr::kable(df)
+```
+
+# <u>Plots of Op Variables</u>
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,10)}
+dfPlot(op, mcex=1.1, cex = 0.8, mfrow=c(2,2))
+```
+
+
+# <u>Map of Operation Locations</u>
+```{r  echo=FALSE, warning=FALSE, message=FALSE, error=FALSE, fig.dim = c(12,10)}
+
+library(leaflet)
+library(leaflet.extras)
+library(htmltools)
+library(htmlwidgets)
+library(mapedit)
+library(mapview)
+
+#list of possible location fields
+begfields <- c("BEG_LATITUDE_DD",  "BEG_LONGITUDE_DD")
+endfields <- c("END_LATITUDE_DD", 
+               "END_LONGITUDE_DD")
+
+#if (names(op) %in% c(begfields))
+leaflet(op) %>%
+  addTiles() %>%
+  addCircleMarkers(lng = ~BEG_LONGITUDE_DD, lat = ~BEG_LATITUDE_DD, opacity=0.1, radius =4,
+             popup = paste("Serial:", op$SERIAL, "<br>",
+                           "Beg_Depth:", op$BEG_DEPTH, "<br>",
+                           "Op_Date:", op$OP_DATE, "<br>",
+                           "Vessel:", op$VESSEL, "<br>",
+                           "Start Latitude:", op$BEG_LATITUDE_DD, "<br>",
+                           "Start Longitude:", op$BEG_LONGITUDE_DD))
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, error=FALSE, fig.dim = c(12,10)}
+#if (names(op) %in% c(endfields))
+#leaflet(op) %>%
+#  addTiles() %>%
+#  addCircleMarkers(lng = ~END_LONGITUDE_DD, lat = ~END_LATITUDE_DD, opacity=0.1, radius =4,
+#             popup = paste("Serial:", op$SERIAL, "<br>",
+#                           "Beg_Depth:", op$BEG_DEPTH, "<br>",
+#                           "Op_Date:", op$OP_DATE, "<br>",
+#                           "Vessel:", op$VESSEL, "<br>",
+#                           "End Latitude:", op$END_LATITUDE_DD, "<br>",
+#                           "End Longitude:", op$END_LONGITUDE_DD))
+```
+
+
+```{r echo=FALSE, message = FALSE, warning = FALSE}
+data("tr_op_names")
+tr_op <- tr_op %>% clean_names(case = "all_caps")
+obs_names <- names(tr_op)
+#check for required fields that can't be NULL. Excepted for csv inputs
+#is 'OP_ID'
+
+if (dat.source =="csv") 
+{
+required <- c('YEAR', 'VESSEL', 'SERIAL', 
+      "TOW_TIME", "SPEED", "SPEED_UNIT",
+      "TYPE_SET", "MESH_SIZE", "TR_DESIGN")
+} else {
+  required <- c("OP_ID",  
+      "TOW_TIME", "SPEED", "SPEED_UNIT",
+      "TYPE_SET", "MESH_SIZE", "TR_DESIGN")
+}
+missed <- setdiff(required, obs_names)
+if (length(missed) > 0)
+    stop(print(paste0("The tr_op data are missing the required field(s) ", missed)))
+```
+
+# <u>Table of TR_OP Variables</u>
+```{r echo=FALSE, message = FALSE, warning = FALSE}
+df <- as.data.frame(CruiseCheckeR::dfSmry(tr_op))
+knitr::kable(df)
+```
+
+# <u>Plots of TR_OP Variables</u>
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,10)}
+dfPlot(tr_op, mcex=1.1, cex = 0.8, mfrow=c(2,2))
+```
+
+
+
+```{r echo=FALSE, message = FALSE, warning = FALSE}
+data("tr_catch_names")
+tr_catch <- tr_catch %>% clean_names(case = "all_caps")
+tr_catch$avg_wt <- tr_catch$WEIGHT/tr_catch$N
+obs_names <- names(tr_catch)
+#check for required fields that can't be NULL. Excepted for csv inputs
+#is 'OP_ID'
+
+if (dat.source =="csv") 
+{
+required <- c('YEAR', 'VESSEL', 'SERIAL', 
+      "SPECIES", "N")
+} else {
+  required <- c("OP_ID",  "SPECIES", "N")
+}
+missed <- setdiff(required, obs_names)
+if (length(missed) > 0)
+    stop(print(paste0("The tr_catch data are missing the required field(s) ", missed)))
+```
+
+# <u>Table of TR_CATCH Variables</u>
+```{r echo=FALSE, message = FALSE, warning = FALSE}
+df <- as.data.frame(CruiseCheckeR::dfSmry(tr_catch))
+
+knitr::kable(df)
+```
+
+# <u>Plots of TR_CATCH Variables</u>
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,10)}
+library(plotly)
+# These are canned plots for all variables.
+dfPlot(tr_catch, mcex=1.1, cex = 0.8, mfrow=c(2,2))
+# Now custom plot to look for errors in catch weight
+tr_catch$Species <- factor(tr_catch$SPECIES)
+options(scipen=10000)
+gg <- ggplot()+
+  geom_point(data = tr_catch, aes(x = Species, y = avg_wt))+
+  scale_y_log10()+
+  theme_bw()+
+  ggtitle("Plot of Catch Weight/Catch N by Species")+
+  labs(y = "Weight/N (g)")
+
+ggplotly(gg)
+```
+
+# <u>Table of TR_L Variables</u>
+```{r echo=FALSE, message = FALSE, warning = FALSE}
+if (dat.source !="csv") {
+df <- as.data.frame(CruiseCheckeR::dfSmry(tr_l))
+knitr::kable(df)
+} else {
+  print("The data source is csv, so the TR_L table does not exist!")
+}
+```
+
+# <u>Plots of TR_L Variables</u>
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,10)}
+if (dat.source !="csv") {
+# These are canned plots for all variables.
+dfPlot(tr_l, mcex=1.1, cex = 0.8, mfrow=c(2,2))
+} else {
+    print("The data source is csv, so the TR_L table does not exist!")
+}
+```  
+
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,10)}  
+# Now custom plot to look for errors in catch weight
+if (dat.source !="csv") {
+options(scipen=10000)
+gg <- ggplot(tr_l, aes(LENGTH))+
+  geom_histogram(binwidth = 10)+
+  theme_bw()+
+  ggtitle("Plot of Length Frequency by Species")
+
+ggplotly(gg)
+} else {
+    print("The data source is csv, so the TR_L table does not exist!")
+}
+```
+
+# <u>Table of TR_FISH Variables</u>
+```{r echo=FALSE, message = FALSE, warning = FALSE}
+data("tr_fish_names")
+tr_fish <- tr_fish %>% clean_names(case = "all_caps")
+obs_names <- names(tr_fish)
+#check for required fields that can't be NULL. Excepted for csv inputs
+#is 'OP_ID'
+
+if (dat.source =="csv") 
+{
+required <- c('YEAR', 'VESSEL', 'SERIAL', 
+      "SPECIES", "LENGTH")
+} else {
+  required <- c("TR_FISH_ID", "OP_ID",  "SPECIES", "LENGTH")
+}
+missed <- setdiff(required, obs_names)
+if (length(missed) > 0)
+    stop(print(paste0("The tr_fish data are missing the required field(s) ", missed)))
+
+df <- as.data.frame(CruiseCheckeR::dfSmry(tr_fish))
+knitr::kable(df)
+```
+
+# <u>Plots of TR_FISH Variables</u>
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,10)}
+library(plotly)
+# These are canned plots for all variables.
+dfPlot(tr_fish, mcex=1.1, cex = 0.8, mfrow=c(2,2))
+```
+
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,10)}
+# Now custom plot to look for errors in catch weight
+options(scipen=10000)
+gg <- ggplot(tr_fish, aes(LENGTH))+
+  geom_histogram(binwidth = 10)+
+  facet_wrap(~SPECIES, scales = "free")+
+  theme_bw()+
+  ggtitle("Plot of Length Distribution by Species")
+ggplotly(gg)
+#now do weight
+gg <- ggplot(tr_fish, aes(WEIGHT))+
+  geom_histogram(binwidth = 10)+
+  facet_wrap(~SPECIES, scales = "free")+
+  theme_bw()+
+  ggtitle("Plot of Weight Distribution by Species")
+ggplotly(gg)
+
+gg <- ggplot()+
+  geom_point(data = tr_fish, aes(x = LENGTH, y = WEIGHT))+
+  facet_wrap(~SPECIES, scales = "free")+
+  theme_bw()+
+  ggtitle("Plot of Length Versus Weight by Species")
+ggplotly(gg)
+```

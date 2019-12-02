@@ -1,0 +1,42 @@
+---
+title: "scrap"
+author: "Dave Warner"
+date: "11/27/2019"
+output: html_document
+---
+
+# <u>Plots of Op Variables</u>
+```{r echo=FALSE}
+dfPlot(op, mcex=1.1, cex = 0.8, mfrow=c(2,2))
+
+```
+
+# <u>Map of Operation Locations</u>
+```{r  echo=FALSE, warning=FALSE, message=FALSE, error=FALSE, error=FALSE, fig.dim = c(12,10)}
+
+library(leaflet)
+library(leaflet.extras)
+library(htmltools)
+library(htmlwidgets)
+library(mapedit)
+library(mapview)
+
+
+jub <- leaflet() %>%
+#addTiles() %>%
+#addCircleMarkers(lng = ~Longitude, lat = ~Latitude, opacity=0.1, radius =4,
+#             popup = paste("Serial:", op$Serial, "<br>",
+#                           "Beg.Depth:", op$Beg.Depth, "<br>",
+#                           "Op_Date:", op$Op_Date, "<br>",
+#                           "Vessel:", op$Vessel, "<br>",
+#                           "Latitude:", op$Latitude, "<br>",
+#                           "Longitude:", op$Longitude))%>%
+   mapview::addFeatures(
+    data=op_sf, weight = 1, color = "#000000")
+
+selectFeatures(jub,
+         mode = "draw", op = sf::st_contains(x, op_sf))
+
+
+
+```
