@@ -135,11 +135,11 @@ CruiseCheckeRDBI <- function(dat.source = "csv", year = 2018, lake = 2,
       collect(), envir = .GlobalEnv)
   } else {
 
-    dir <- tclvalue(tkchooseDirectory())
+    thedir <- tclvalue(tkchooseDirectory())
     assign("dir", dir , envir = .GlobalEnv )
 
     f.list <-
-      list.files(dir, pattern = "op|tr_op|tr_catch|tr_lf|tr_l|tr_fish", full.names = TRUE)
+      list.files(thedir, pattern = "op|tr_op|tr_catch|tr_lf|tr_l|tr_fish", full.names = TRUE)
     filelist <- lapply(f.list, read.csv)
     names(filelist) <- gsub(pattern = ".csv",
                             "",
@@ -150,6 +150,7 @@ CruiseCheckeRDBI <- function(dat.source = "csv", year = 2018, lake = 2,
   }
   pth <- system.file("rmd", "Cruisecheck.Rmd", package = "CruiseCheckeR")
   rmarkdown::render(pth, output_format = "html_document",
-                    output_file = paste0(dir, "/", lake, " -", year, " - ", "Cruisecheck-",                     Sys.Date()))
+                    output_file = paste0(thedir, "/", "Lake-", lake, "-", "Year-", year, "-", "Cruisecheck-",                     Sys.Date()))
 }
+
 
