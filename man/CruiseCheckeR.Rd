@@ -24,7 +24,7 @@ location which is used in naming output files.}
 return data collected during the Lake Michigan LWAP fall acoustic survey.}
 
 \item{stype}{Numeric vector representing the type of sample data to be evaluated. For example,
-SAMPLE_TYPE (stype) = 1 for trawl data.}
+SAMPLE_TYPE (stype) = 1 for trawl data. Currently only functional for stype = 1.}
 
 \item{username}{Character vector. This is the username required to access the database, if required.}
 

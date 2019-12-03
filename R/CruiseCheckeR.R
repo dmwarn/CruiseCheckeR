@@ -13,7 +13,7 @@
 #' location which is used in naming output files.
 #' @param stype
 #' Numeric vector representing the type of sample data to be evaluated. For example,
-#' SAMPLE_TYPE (stype) = 1 for trawl data.
+#' SAMPLE_TYPE (stype) = 1 for trawl data. Currently only functional for stype = 1.
 #' @param target
 #' Numeric vector representing the study or study type. For example, target = c(209) would
 #' return data collected during the Lake Michigan LWAP fall acoustic survey.
