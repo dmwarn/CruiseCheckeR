@@ -126,6 +126,7 @@ knitr::kable(df)
 # <u>Plots of TR_OP Variables</u>
 ```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,14)}
 dfPlot(tr_op, mcex=1.1, cex = 0.8, mfrow=c(2,2))
+hist(tr_op$SPEED)
 ```
 
 
@@ -247,7 +248,7 @@ dfPlot(tr_fish, mcex=1.1, cex = 0.8, mfrow=c(2,2))
 ```
 
 # <u>Additional Plots of TR_FISH Variables</u>
-```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,14)}
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(10,14)}
 library(plotly)
 # Now custom plot to look for errors in catch weight
 options(scipen=1000)
@@ -256,20 +257,19 @@ gg <- ggplot(tr_fish, aes(LENGTH))+
   facet_wrap(~SPECIES, scales = "free", ncol = 2)+
   theme_bw()+
   ggtitle("Plot of Length Distribution by Species")
-ggplotly(gg)
 
 #now do weight
-gg <- ggplot(tr_fish, aes(WEIGHT))+
+ggplot(tr_fish, aes(WEIGHT))+
   geom_histogram(bins = 50)+
   facet_wrap(~SPECIES, scales = "free", ncol = 2)+
   theme_bw()+
   ggtitle("Plot of Weight Distribution by Species")
-ggplotly(gg)
 
-gg <- ggplot()+
+
+ggplot()+
   geom_point(data = tr_fish, aes(x = LENGTH, y = round(WEIGHT, 1)))+
   facet_wrap(~SPECIES, scales = "free", ncol = 2)+
   theme_bw()+
   ggtitle("Plot of Length Versus Weight by Species")
-ggplotly(gg)
+
 ```
