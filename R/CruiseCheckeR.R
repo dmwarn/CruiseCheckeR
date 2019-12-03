@@ -23,7 +23,7 @@
 #'   Generates an html file with various plots and checks of data consistency,
 #'   accuracy, and completeness.
 #'
-#' @import utils tcltk ROracle DBI
+#' @import utils tcltk RODBC DBI
 #' @export
 #'
 #' @details

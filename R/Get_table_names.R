@@ -12,7 +12,7 @@
 #'  This is a helper function that gets the names of the fields in tables used
 #'  for trawl data that are in the database. The field names in csv input
 #'  files are compared against these names.
-#' @import ROracle
+#' @import RODBC
 #' @export
 #'
 #'@details
@@ -27,7 +27,7 @@ Get_table_names <- function(username , password , dbname , sample_type ) {
   # field names for the tables associated with trawl data
   drv <- dbDriver("Oracle")
   con <- dbConnect(drv, username = "dmwarner",
-                   password = "GLSC19008", default = NULL, gui = .GUI,
+                   password = "GLSC1908", default = NULL, gui = .GUI,
                    dbname = "GLSC")
   # Get op table field names
   # The query, which selects all fields, row zero,
