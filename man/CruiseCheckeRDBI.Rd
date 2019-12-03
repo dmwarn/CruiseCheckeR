@@ -5,8 +5,8 @@
 \title{Cruise data check via R}
 \usage{
 CruiseCheckeRDBI(dat.source = "csv", year = 2018, lake = 2,
-  target = 1, stype = 1, username = "", password = "",
-  dbname = "")
+  vessel = 17, cruise = c(1, 2, 3, 4, 5, 6, 7), target = 1,
+  stype = 1, username = "", password = "", dbname = "")
 }
 \arguments{
 \item{dat.source}{This determines if the function should operate on local csv files or

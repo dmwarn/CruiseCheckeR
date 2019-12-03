@@ -27,8 +27,8 @@
 #' @return
 #'   Generates an html file with various plots and checks of data consistency,
 #'   accuracy, and completeness.
-#'
-#' @import utils tcltk RODBC DBI dplyr dbplyr
+#' @importFrom dbplyr in_schema
+#' @import utils tcltk RODBC DBI dplyr
 #' @export
 #'
 #' @details
@@ -42,9 +42,13 @@
 #'  the current iteration ONLY works with trawl data. Future developments could add
 #'  other sample types.
 CruiseCheckeRDBI <- function(dat.source = "csv", year = 2018, lake = 2,
-                          target = 1, stype = 1, username = "", password = "", dbname = "") {
+              vessel = 17, cruise = c(1, 2, 3, 4, 5, 6, 7), target = 1,
+              stype = 1, username = "", password = "", dbname = "") {
   assign("year", year , envir = .GlobalEnv )
   assign("lake", lake , envir = .GlobalEnv )
+  assign("vessel", vessel , envir = .GlobalEnv )
+  assign("cruise", cruise, envir = .GlobalEnv )
+  assign("target", target , envir = .GlobalEnv )
 
   if (dat.source == "database") {
     ##############################
@@ -150,7 +154,10 @@ CruiseCheckeRDBI <- function(dat.source = "csv", year = 2018, lake = 2,
   }
   pth <- system.file("rmd", "Cruisecheck.Rmd", package = "CruiseCheckeR")
   rmarkdown::render(pth, output_format = "html_document",
-                    output_file = paste0(thedir, "/", "Lake-", lake, "-", "Year-", year, "-", "Cruisecheck-",                     Sys.Date()))
+                    output_file = paste0(thedir, "/", "Year", "-", year,
+                "-", "Lake", "-", lake, "-", "Vessel", "-",vessel, "-",
+                "Cruise", "-", cruise, "-",
+                "Target", "-", target, "-", "Cruisecheck", "-", Sys.Date()))
 }
 
 
