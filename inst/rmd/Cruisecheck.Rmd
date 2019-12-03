@@ -1,13 +1,27 @@
 ---
-title: "CruiseCheck"
-author: "Dave Warner"
-date: "11/13/2019"
-output: html_document
+output:
+  html_document:
+    css: style.css
 ---
-### This code will provide you an overview of the characteristics of trawl data tables. It will only work for csv data
-if your files are called op, tr_op, tr_catch, tr_l, tr_lf, tr_fish. It will fail with any other file names. It is just that simple. Fix the file names or edit the code to accept a wider range of file names with can be coerced to these and I will gladly add that to the package/function.
 
-The code will behave differently depending on whether or not the input is "csv" or not. The first step in examing csv files is to see if they have required fields. Such fields represent those that can't be null in the RVCAT database. If required fields are absent, or they are not properly named, the user will be prompted to remedy this with a message stating which fields are not correct. This step is only necessary for csv files.
+```{r echo=FALSE, message = FALSE, warning = FALSE}
+thename <- (paste0("Year", "-", year,
+         "-", "Lake", "-", lake, "-", "Vessel", "-",vessel, "-",
+         "Cruise", "-", cruise, "-","Target", "-", target))
+dat <- Sys.Date()
+info <- Sys.info()
+auth <- info[7]
+```
+
+---
+title: `r thename`
+date: `r dat`
+author: `r auth`
+---
+
+This code will provide you an overview of the characteristics of trawl data tables. It will only work for csv data if your files are called op, tr_op, tr_catch, tr_l, tr_lf, tr_fish. It will fail with any other file names. It is just that simple. Fix the file names or edit the code to accept a wider range of file names with can be coerced to these and I will gladly add that to the package/function.
+
+The code will behave differently depending on whether or not the input is "csv" or not. The first step in examing csv files is to see if they have required fields. Such fields represent those that can't be null in the RVCAT database. If required fields are absent, or they are not properly named, the user will be prompted to remedy this with a message stating which fields are not correct. This step is only necessary for csv files. 
 
 # <u>OP Variables</u>
 ```{r echo=FALSE, message = FALSE, warning = FALSE}
@@ -35,13 +49,13 @@ knitr::kable(df)
 ```
 
 # <u>Plots of OP Variables</u>
-```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,12)}
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,14)}
 dfPlot(op, mcex=1.1, cex = 0.8, mfrow=c(2,2))
 ```
 
 
 # <u>Map of OP Locations</u>
-```{r  echo=FALSE, warning=FALSE, message=FALSE, error=FALSE, fig.dim = c(12,12)}
+```{r  echo=FALSE, warning=FALSE, message=FALSE, error=FALSE, fig.dim = c(12,14)}
 
 library(leaflet)
 library(leaflet.extras)
@@ -110,7 +124,7 @@ knitr::kable(df)
 ```
 
 # <u>Plots of TR_OP Variables</u>
-```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,12)}
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,14)}
 dfPlot(tr_op, mcex=1.1, cex = 0.8, mfrow=c(2,2))
 ```
 
@@ -144,19 +158,19 @@ knitr::kable(df)
 ```
 
 # <u>Plots of TR_CATCH Variables</u>
-```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,12)}
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,14)}
 library(plotly)
 # These are canned plots for all variables.
 dfPlot(tr_catch, mcex=1.1, cex = 0.8, mfrow=c(2,2))
 ```
 
 # <u>Additional Plots of TR_CATCH Variables</u>
-```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,12)}
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,14)}
 # Now custom plot to look for errors in catch weight
 tr_catch$Species <- factor(tr_catch$SPECIES)
-options(scipen=10000)
+options(scipen=1000)
 gg <- ggplot()+
-  geom_point(data = tr_catch, aes(x = Species, y = avg_wt))+
+  geom_point(data = tr_catch, aes(x = Species, y = round(avg_wt, 1)))+
   scale_y_log10()+
   theme_bw()+
   ggtitle("Plot of Catch Weight/Catch N by Species")+
@@ -176,7 +190,7 @@ knitr::kable(df)
 ```
 
 # <u>Plots of TR_L Variables</u>
-```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,12)}
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,14)}
 if (dat.source !="csv") {
 # These are canned plots for all variables.
 dfPlot(tr_l, mcex=1.1, cex = 0.8, mfrow=c(2,2))
@@ -186,10 +200,10 @@ dfPlot(tr_l, mcex=1.1, cex = 0.8, mfrow=c(2,2))
 ```  
 
 # <u>Plots of TR_L Variables</u>
-```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,12)}  
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,14)}  
 # Now custom plot to look for errors in catch weight
 if (dat.source !="csv") {
-options(scipen=10000)
+options(scipen=1000)
 gg <- ggplot(tr_l, aes(LENGTH))+
   geom_histogram(binwidth = 10)+
   theme_bw()+
@@ -226,17 +240,17 @@ knitr::kable(df)
 ```
 
 # <u>Plots of TR_FISH Variables</u>
-```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,12)}
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.width = 12, fig.height=12}
 
 # These are canned plots for all variables.
 dfPlot(tr_fish, mcex=1.1, cex = 0.8, mfrow=c(2,2))
 ```
 
 # <u>Additional Plots of TR_FISH Variables</u>
-```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,12)}
+```{r echo=FALSE, message = FALSE, warning = FALSE, fig.dim = c(12,14)}
 library(plotly)
 # Now custom plot to look for errors in catch weight
-options(scipen=10000)
+options(scipen=1000)
 gg <- ggplot(tr_fish, aes(LENGTH))+
   geom_histogram(binwidth = 10)+
   facet_wrap(~SPECIES, scales = "free", ncol = 2)+
@@ -253,7 +267,7 @@ gg <- ggplot(tr_fish, aes(WEIGHT))+
 ggplotly(gg)
 
 gg <- ggplot()+
-  geom_point(data = tr_fish, aes(x = LENGTH, y = WEIGHT))+
+  geom_point(data = tr_fish, aes(x = LENGTH, y = round(WEIGHT, 1)))+
   facet_wrap(~SPECIES, scales = "free", ncol = 2)+
   theme_bw()+
   ggtitle("Plot of Length Versus Weight by Species")

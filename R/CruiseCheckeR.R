@@ -22,7 +22,7 @@
 #' @param password
 #'   Password for database access.
 #' @param dbname
-#'   Name of the data source. If using ROracle, it should be GLSC.
+#'   Name of the data source. If using DBI, it should be GLSC.
 #'
 #' @return
 #'   Generates an html file with various plots and checks of data consistency,
@@ -154,8 +154,17 @@ CruiseCheckeR <- function(dat.source = "csv", year = 2018, lake = 2,
 
   }
   pth <- system.file("rmd", "Cruisecheck.Rmd", package = "CruiseCheckeR")
+  assign('info', Sys.info(), envir = .GlobalEnv )
+  assign('auth', info[7], envir = .GlobalEnv )
+  assign('dat', Sys.Date(), envir = .GlobalEnv )
+  assign('cruise', cruise, envir = .GlobalEnv )
+  assign('thename', paste0("Year", "-", year,
+         "-", "Lake", "-", lake, "-", "Vessel", "-",vessel, "-",
+         "Cruise", "-", cruise, "-","Target", "-", target, "-", "Cruisecheck"),
+         envir = .GlobalEnv )
+
   rmarkdown::render(pth, output_format = "html_document",
-                    output_file = paste0(thedir, "/", "Year", "-", year,
+    output_file = paste0(thedir, "/", "Year", "-", year,
                 "-", "Lake", "-", lake, "-", "Vessel", "-",vessel, "-",
                 "Cruise", "-", cruise, "-",
                 "Target", "-", target, "-", "Cruisecheck", "-", Sys.Date()))

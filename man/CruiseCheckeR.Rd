@@ -30,7 +30,7 @@ SAMPLE_TYPE (stype) = 1 for trawl data. Currently only functional for stype = 1.
 
 \item{password}{Password for database access.}
 
-\item{dbname}{Name of the data source. If using ROracle, it should be GLSC.}
+\item{dbname}{Name of the data source. If using DBI, it should be GLSC.}
 }
 \value{
 Generates an html file with various plots and checks of data consistency,
