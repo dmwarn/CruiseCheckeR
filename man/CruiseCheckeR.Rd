@@ -4,8 +4,9 @@
 \alias{CruiseCheckeR}
 \title{Cruise data check via R}
 \usage{
-CruiseCheckeR(dat.source = "csv", year = "2019", lake = "Michigan",
-  username = "", password = "", dbname = "")
+CruiseCheckeR(dat.source = "csv", year = 2018, lake = 2,
+  vessel = 17, cruise = c(1, 2, 3, 4, 5, 6, 7), target = 1,
+  stype = 1, username = "", password = "", dbname = "")
 }
 \arguments{
 \item{dat.source}{This determines if the function should operate on local csv files or
@@ -18,6 +19,12 @@ used in maming output files.}
 
 \item{lake}{Character vector. For example, "Michigan". Provides information about
 location which is used in naming output files.}
+
+\item{target}{Numeric vector representing the study or study type. For example, target = c(209) would
+return data collected during the Lake Michigan LWAP fall acoustic survey.}
+
+\item{stype}{Numeric vector representing the type of sample data to be evaluated. For example,
+SAMPLE_TYPE (stype) = 1 for trawl data.}
 
 \item{username}{Character vector. This is the username required to access the database, if required.}
 

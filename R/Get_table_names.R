@@ -26,9 +26,9 @@ Get_table_names <- function(username , password , dbname , sample_type ) {
   # use the credentials to log in to database to get
   # field names for the tables associated with trawl data
   drv <- dbDriver("Oracle")
-  con <- dbConnect(drv, username = "dmwarner",
-                   password = "GLSC1908", default = NULL, gui = .GUI,
-                   dbname = "GLSC")
+  con <- dbConnect(drv, username = "",
+                   password = "", default = NULL, gui = .GUI,
+                   dbname = "")
   # Get op table field names
   # The query, which selects all fields, row zero,
   # which happens to be the field names.

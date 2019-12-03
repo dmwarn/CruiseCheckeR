@@ -11,6 +11,12 @@
 #' @param lake
 #' Character vector. For example, "Michigan". Provides information about
 #' location which is used in naming output files.
+#' @param stype
+#' Numeric vector representing the type of sample data to be evaluated. For example,
+#' SAMPLE_TYPE (stype) = 1 for trawl data.
+#' @param target
+#' Numeric vector representing the study or study type. For example, target = c(209) would
+#' return data collected during the Lake Michigan LWAP fall acoustic survey.
 #' @param username
 #'   Character vector. This is the username required to access the database, if required.
 #' @param password
@@ -18,12 +24,11 @@
 #' @param dbname
 #'   Name of the data source. If using ROracle, it should be GLSC.
 #'
-#'
 #' @return
 #'   Generates an html file with various plots and checks of data consistency,
 #'   accuracy, and completeness.
-#'
-#' @import utils tcltk RODBC DBI
+#' @importFrom dbplyr in_schema
+#' @import utils tcltk RODBC DBI dplyr
 #' @export
 #'
 #' @details
@@ -36,10 +41,14 @@
 #'  a wide variety of both field and laboratory sampling exercises. More specifically,
 #'  the current iteration ONLY works with trawl data. Future developments could add
 #'  other sample types.
-CruiseCheckeR <- function(dat.source = "csv", year = "2019", lake = "Michigan",
-                          username = "", password = "", dbname = "") {
+CruiseCheckeR <- function(dat.source = "csv", year = 2018, lake = 2,
+              vessel = 17, cruise = c(1, 2, 3, 4, 5, 6, 7), target = 1,
+              stype = 1, username = "", password = "", dbname = "") {
   assign("year", year , envir = .GlobalEnv )
   assign("lake", lake , envir = .GlobalEnv )
+  assign("vessel", vessel , envir = .GlobalEnv )
+  assign("cruise", cruise, envir = .GlobalEnv )
+  assign("target", target , envir = .GlobalEnv )
 
   if (dat.source == "database") {
     ##############################
@@ -87,45 +96,55 @@ CruiseCheckeR <- function(dat.source = "csv", year = "2019", lake = "Michigan",
     dbase <- z
 
     drv <- dbDriver("Oracle")
-    con <- dbConnect(drv, username = usname,
-                     password = pwrd, default = "", gui = .GUI,
-                     dbname = dbase)
+    #con <- dbConnect(drv, uid = usname,
+    #                 pwd = pwrd, default = "", gui = .GUI,
+    #                 dbname = dbase)
+    #con <- odbcConnect(dbase, uid=usname, pwd= pwrd, believeNRows=FALSE)
+    conn <- dbConnect(drv = drv, dbname = dbase, user = usname,
+                      password = pwrd)
     #############################
     #############################
-    assign("op", dbGetQuery(con, "select  *
-    from    choose, rvcat.op
-    where   op_id = op"), envir = .GlobalEnv)
-    #oper <- dbGetQuery(con, "select  *
-    #from    choose, rvcat.op
-    #where   op_id = op")
-    #assign("op", oper, envir = .GlobalEnv)
+    assign('op' <- left_join(x = dplyr::tbl(conn, dbplyr::in_schema("RVCAT", "op")) %>%
+          dplyr::filter(YEAR == year & LAKE == lake & SAMPLE_TYPE ==stype &
+                          VESSEL == vessel & CRUISE == cruise),
+          y = dplyr::tbl(conn, dbplyr::in_schema("RVCAT", "op_target")), by = "OP_ID") %>%
+      dplyr::filter(TARGET %in% target) %>%
+      dplyr::collect(), envir = .GlobalEnv)
+    #  create vector of OP_ID to use to subset subsequent tables.
+    assign('opid', op$OP_ID, envir = .GlobalEnv)
 
-    assign("tr_op", dbGetQuery(con, "select  *
-    from    choose, rvcat.tr_op
-    where   op_id = op"), envir = .GlobalEnv)
+    if (stype == 1)
+      # Select rows from tr_op that have OP_ID in op
+      assign('tr_op', dplyr::tbl(conn, dbplyr::in_schema("RVCAT", "tr_op")) %>%
+      dplyr::filter(OP_ID %in% opid) %>%
+      collect(), envir = .GlobalEnv)
 
-    assign("tr_catch", dbGetQuery(con, "select  *
-    from    choose, rvcat.tr_catch
-    where   op_id = op"), envir = .GlobalEnv)
+    # Select rows from tr_catch that have OP_ID in op
+    assign('tr_catch', dplyr::tbl(conn, dbplyr::in_schema("RVCAT", "tr_catch")) %>%
+      dplyr::filter(OP_ID %in% opid) %>%
+      collect(), envir = .GlobalEnv)
 
-    assign("tr_l", dbGetQuery(con, "select  *
-    from    choose, rvcat.tr_l
-    where   op_id = op"), envir = .GlobalEnv)
+    # Select rows from tr_l that have OP_ID in op
+    assign('tr_l', dplyr::tbl(conn, dbplyr::in_schema("RVCAT", "tr_l")) %>%
+      dplyr::filter(OP_ID %in% opid) %>%
+      collect(), envir = .GlobalEnv)
 
-    assign("tr_lf", dbGetQuery(con, "select  *
-    from    choose, rvcat.tr_lf
-    where   op_id = op"), envir = .GlobalEnv)
+    # Select rows from tr_lf that have OP_ID in op
+    assign('tr_lf', dplyr::tbl(conn, dbplyr::in_schema("RVCAT", "tr_lf")) %>%
+      dplyr::filter(OP_ID %in% opid) %>%
+      collect(), envir = .GlobalEnv)
 
-    assign("tr_fish", dbGetQuery(con, "select  *
-    from    choose, rvcat.tr_fish
-    where   op_id = op"), envir = .GlobalEnv)
+    # Select rows from tr_op that have OP_ID in op
+    assign('tr_fish', dplyr::tbl(conn, dbplyr::in_schema("RVCAT", "tr_fish")) %>%
+      dplyr::filter(OP_ID %in% opid) %>%
+      collect(), envir = .GlobalEnv)
   } else {
 
-    dir <- tclvalue(tkchooseDirectory())
+    thedir <- tclvalue(tkchooseDirectory())
     assign("dir", dir , envir = .GlobalEnv )
 
     f.list <-
-      list.files(dir, pattern = "op|tr_op|tr_catch|tr_lf|tr_l|tr_fish", full.names = TRUE)
+      list.files(thedir, pattern = "op|tr_op|tr_catch|tr_lf|tr_l|tr_fish", full.names = TRUE)
     filelist <- lapply(f.list, read.csv)
     names(filelist) <- gsub(pattern = ".csv",
                             "",
@@ -136,6 +155,10 @@ CruiseCheckeR <- function(dat.source = "csv", year = "2019", lake = "Michigan",
   }
   pth <- system.file("rmd", "Cruisecheck.Rmd", package = "CruiseCheckeR")
   rmarkdown::render(pth, output_format = "html_document",
-                    output_file = paste0(dir, "/", lake, " -", year, " - ", "Cruisecheck-",                     Sys.Date()))
+                    output_file = paste0(thedir, "/", "Year", "-", year,
+                "-", "Lake", "-", lake, "-", "Vessel", "-",vessel, "-",
+                "Cruise", "-", cruise, "-",
+                "Target", "-", target, "-", "Cruisecheck", "-", Sys.Date()))
 }
+
 
