@@ -28,7 +28,7 @@
 #'   Generates an html file with various plots and checks of data consistency,
 #'   accuracy, and completeness.
 #' @importFrom dbplyr in_schema
-#' @import utils tcltk RODBC DBI dplyr
+#' @import utils tcltk DBI dplyr
 #' @export
 #'
 #' @details

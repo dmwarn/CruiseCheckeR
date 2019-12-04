@@ -12,7 +12,7 @@
 #'  This is a helper function that gets the names of the fields in tables used
 #'  for trawl data that are in the database. The field names in csv input
 #'  files are compared against these names.
-#' @import RODBC
+#' @import RODBC DBI
 #' @export
 #'
 #'@details
