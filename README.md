@@ -1,2 +1,6 @@
 # CruiseCheckeR
-Code for checking accuracy, completeness, and consistency of data for GLSC databases.
+CruiseCheckeR is an R package written to provide a tool for examining data intended for entry in the U.S.G.S. Great Lakes Science Center RVCAT database. The data stored in this database includes a more broad suite of sample types than is currently supported by this package. At present, the package is only useful for trawl data.
+
+The typical process of getting data into the RVCAT database has included appending of new data followed by visualization of data to look for errors or problems. Researchers provide either csv files or Oracle dmp files to the GLSC database manager, who would append the data to the appropriate tables. Subsequently, researchers would use a variety of tools to examine the accuracy, correctness, and completeness of data. The two things these tools have in common are 1) they require the researcher to query the data from the RVCAT database and 2) they have been used on data AFTER they are appended to the database.
+
+Because the tools have been used primarily after they are appended, this has mean that any corrections have to be made to the database. This package includes the function CruiseCheckeR(), which allows the user to visualize data prior to appending to the database and also allows the user to visualize data in csv files prior to the appending process.
