@@ -7,7 +7,7 @@
 #'   Lakes Science Center, should be GLSC.
 #' @param year
 #' Character vector, year value in quotes. Provides information about the year, which is
-#' used in maming output files.
+#' used in naming output files.
 #' @param lake
 #' Character vector. For example, "Michigan". Provides information about
 #' location which is used in naming output files.
@@ -28,7 +28,7 @@
 #'   Generates an html file with various plots and checks of data consistency,
 #'   accuracy, and completeness.
 #' @importFrom dbplyr in_schema
-#' @import utils tcltk DBI dplyr
+#' @import utils tcltk ROracle DBI dplyr
 #' @export
 #'
 #' @details
@@ -105,8 +105,8 @@ CruiseCheckeR <- function(dat.source = "csv", year = 2018, lake = 2,
     #############################
     #############################
     assign('op' <- left_join(x = dplyr::tbl(conn, dbplyr::in_schema("RVCAT", "op")) %>%
-          dplyr::filter(YEAR == year & LAKE == lake & SAMPLE_TYPE ==stype &
-                          VESSEL == vessel & CRUISE == cruise),
+          dplyr::filter(YEAR %in% year & LAKE == lake & SAMPLE_TYPE ==stype &
+                          VESSEL %in% vessel & CRUISE %in% cruise),
           y = dplyr::tbl(conn, dbplyr::in_schema("RVCAT", "op_target")), by = "OP_ID") %>%
       dplyr::filter(TARGET %in% target) %>%
       dplyr::collect(), envir = .GlobalEnv)
